@@ -1,27 +1,35 @@
 package main
 
 import (
+	"log"
+
 	"github.com/farbodahm/dynamodb-optimistic-locking/pkg/ddb"
-	"github.com/farbodahm/dynamodb-optimistic-locking/pkg/tables"
+	"github.com/spf13/cobra"
 )
 
+// getCommandLineParser creates the command line parser using Cobra
+func getCommandLineParser() *cobra.Command {
+	return &cobra.Command{
+		Use:   "dynamodb-optimistic-locking",
+		Short: "Simple application to create a race condition on DynamoDB and solve it using optimistic locking (versioning)",
+	}
+}
+
 func main() {
-
 	dynamo := ddb.NewDynamoDBClient()
+	cmd := getCommandLineParser()
 
-	sampleProducts := []tables.Products{
-		{Id: "p#0", Name: "Product 0", Quantity: 10, Version: 1},
-		{Id: "p#1", Name: "Product 1", Quantity: 4, Version: 1},
-		{Id: "p#2", Name: "Product 2", Quantity: 2, Version: 1},
-		{Id: "p#3", Name: "Product 3", Quantity: 6, Version: 1},
-		{Id: "p#4", Name: "Product 4", Quantity: 1, Version: 1},
-		{Id: "p#5", Name: "Product 5", Quantity: 0, Version: 1},
+	var populateTable bool
+	cmd.Flags().BoolVar(&populateTable, "populate-table", false, "Populate the table with some sample data")
+
+	if err := cmd.Execute(); err != nil {
+		log.Fatalln("Failed to parse arguments:", err)
 	}
 
-	products := make([]ddb.DynamoDBWritable, len(sampleProducts))
-	for i, product := range sampleProducts {
-		products[i] = product
+	if populateTable {
+		log.Println("Populating `products` table with sample data...")
+		if err := populateProductsTable(*dynamo); err != nil {
+			log.Fatalln("Failed to populate products table:", err)
+		}
 	}
-
-	dynamo.AddBatch("products", products, 100)
 }
