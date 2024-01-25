@@ -60,3 +60,16 @@ func (d DynamoDB) AddBatch(tableName string, records []DynamoDBWritable, max int
 
 	return written, err
 }
+
+// GetItem returns the requested key from the given table
+func (d DynamoDB) GetItem(tableName string, key map[string]types.AttributeValue) (map[string]types.AttributeValue, error) {
+	result, err := d.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
+		TableName: &tableName,
+		Key:       key,
+	})
+	if err != nil {
+		log.Printf("Couldn't get item from %v: %v\n", tableName, err)
+		return nil, err
+	}
+	return result.Item, nil
+}
