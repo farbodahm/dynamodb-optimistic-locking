@@ -5,10 +5,10 @@ import (
 	"github.com/farbodahm/dynamodb-optimistic-locking/pkg/tables"
 )
 
-// populateProductsTable populates the products table with sample data.
+// populateProductsTable populates the Product table with sample data.
 func populateProductsTable(dynamo ddb.DynamoDB) error {
 
-	sampleProducts := []tables.Products{
+	sampleProduct := []tables.Product{
 		{Id: "p#0", Name: "Product 0", Quantity: 10, Version: 1},
 		{Id: "p#1", Name: "Product 1", Quantity: 4, Version: 1},
 		{Id: "p#2", Name: "Product 2", Quantity: 2, Version: 1},
@@ -17,11 +17,11 @@ func populateProductsTable(dynamo ddb.DynamoDB) error {
 		{Id: "p#5", Name: "Product 5", Quantity: 0, Version: 1},
 	}
 
-	products := make([]ddb.DynamoDBWritable, len(sampleProducts))
-	for i, product := range sampleProducts {
-		products[i] = product
+	Product := make([]ddb.DynamoDBWritable, len(sampleProduct))
+	for i, product := range sampleProduct {
+		Product[i] = product
 	}
 
-	_, err := dynamo.AddBatch("products", products, 100)
+	_, err := dynamo.AddBatch("products", Product, 100)
 	return err
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/farbodahm/dynamodb-optimistic-locking/pkg/ddb"
+	"github.com/farbodahm/dynamodb-optimistic-locking/pkg/tables"
 	"github.com/spf13/cobra"
 )
 
@@ -32,4 +33,10 @@ func main() {
 			log.Fatalln("Failed to populate products table:", err)
 		}
 	}
+
+	x, err := tables.GetProduct(*dynamo, "p#1")
+	if err != nil {
+		log.Fatalln("Failed to get product:", err)
+	}
+	log.Println(x)
 }
