@@ -73,3 +73,19 @@ func (d DynamoDB) GetItem(tableName string, key map[string]types.AttributeValue)
 	}
 	return result.Item, nil
 }
+
+// UpdateItem updates the given key considering given update expression
+func (d DynamoDB) UpdateItem(tableName string, key map[string]types.AttributeValue, updateExpression string, conditionExpression string, expressionAttributeValues map[string]types.AttributeValue) (map[string]types.AttributeValue, error) {
+	result, err := d.DynamoDbClient.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
+		TableName:                 &tableName,
+		Key:                       key,
+		UpdateExpression:          &updateExpression,
+		ConditionExpression:       &conditionExpression,
+		ExpressionAttributeValues: expressionAttributeValues,
+	})
+	if err != nil {
+		log.Printf("Couldn't update item from %v: %v\n", tableName, err)
+		return nil, err
+	}
+	return result.Attributes, nil
+}

@@ -19,6 +19,7 @@ func getCommandLineParser() *cobra.Command {
 func main() {
 	dynamo := ddb.NewDynamoDBClient()
 	cmd := getCommandLineParser()
+	tableName := "products"
 
 	var populateTable bool
 	cmd.Flags().BoolVar(&populateTable, "populate-table", false, "Populate the table with some sample data")
@@ -34,9 +35,11 @@ func main() {
 		}
 	}
 
-	x, err := tables.GetProduct(*dynamo, "p#1")
+	x, err := tables.GetProduct(*dynamo, tableName, "p#1")
 	if err != nil {
 		log.Fatalln("Failed to get product:", err)
 	}
 	log.Println(x)
+
+	tables.SafeUpdateProductQuantity(*dynamo, tableName, x)
 }
