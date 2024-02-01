@@ -1,0 +1,35 @@
+name: Terraform Format and Validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Terraform ${{ matrix.task }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [fmt, validate]
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.1"
+      - name: Terraform Format
+        if: matrix.task == 'fmt'
+        run: terraform fmt -check
+      - name: Terraform Init
+        if: matrix.task == 'validate'
+        run: terraform init -backend=false
+      - name: Terraform Validate
+        if: matrix.task == 'validate'
+        run: terraform validate
